@@ -1,19 +1,10 @@
 (ns mission-match.models.missions
     (:require  [monger.core :as mg]
-               [monger.collection :as mc]
-               [mount.core mount])
+               [monger.collection :as mc])
      (:import org.bson.types.ObjectId)) 
 
+(require '[mission-match.db :refer [db]])
 
-
-
-(mount.core/defstate conn
-    :start  mg/connect 
-    :stop   mg/disconnect)
-
-
-(mount.core/defstate db 
-  :start (mg/get-db conn "mission-match"))
 
 (defn existence [] "I exist")
 
