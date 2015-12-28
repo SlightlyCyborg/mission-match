@@ -1,6 +1,6 @@
 (ns mission-match.db
-  (:require [mount.core :refer [defstate]]
-            [monger.core :as mg]))
+  (:require [monger.core :as mg]
+            [com.stuartsierra.component :as component]))
 
 (defstate conn
     :start  mg/connect 
@@ -11,3 +11,11 @@
 (mount.core/defstate db 
   :start (mg/get-db conn "mission-match"))
  
+
+(defrecord Database []
+  component/Lifecycle
+
+  (start [component]
+    (println "Starting Database")
+    (let [conn (mg/connect)]
+      (assoc component :conn conn))))
