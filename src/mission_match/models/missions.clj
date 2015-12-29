@@ -9,7 +9,9 @@
 (defn insert-mission [args]
   (mc/insert (db/get-db) "missions" {:_id (ObjectId.) 
                             :text (args :text) 
-                            :user-id (args :user-id)}))
+                            :user-id (args :user-id)})
+  
+  )
 
 (defn get-mission-by-user [user-id]
   (mc/find-one-as-map (db/get-db) "missions" {:user-id user-id}))

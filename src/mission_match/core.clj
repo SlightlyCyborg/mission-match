@@ -1,6 +1,7 @@
 (ns mission-match.core)
 (use 'hiccup.core)
 (use 'ring.middleware.file)
+(use 'ring.middleware.params)
 (use '[mission-match.models.missions :as mission])
 (use '[mission-match.router :as router])
 
@@ -62,4 +63,6 @@
 
 
 (def main-handler 
-  (-> handler (wrap-file "resources/public")))
+  (-> handler 
+      (wrap-file "resources/public")
+      (wrap-params)))
