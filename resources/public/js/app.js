@@ -4,6 +4,7 @@
         var data = $("form").serialize();
         $.post("submit", data, function(d){
             console.log(d);
+            location.reload()
         });
     });
 })();

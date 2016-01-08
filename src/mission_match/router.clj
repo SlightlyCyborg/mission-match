@@ -9,10 +9,10 @@
 
   (let [form-params (request :form-params)
         mission-status (mission/insert-mission form-params)]
-
-  {:status 200
-   :headers {"Content-Type" "text"}
-   :body (json/write-str {:status mission-status})
-   }))
+    {:status 200
+    :headers {"Content-Type" "text"}
+    :session {:username (form-params "username")}
+    :body (json/write-str {:status mission-status})
+    }))
 
 

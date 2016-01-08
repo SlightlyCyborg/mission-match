@@ -1,0 +1,3 @@
+[submodule "semantic-similarity"]
+	path = semantic-similarity
+	url = https://github.com/SlightlyCyborg/semantic-similarity.git

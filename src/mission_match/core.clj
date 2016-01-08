@@ -4,6 +4,7 @@
 (use 'ring.middleware.params)
 (use '[mission-match.models.missions :as mission])
 (use '[mission-match.router :as router])
+(use 'ring.middleware.session)
 
 
 (defn make-select [attrs options]
@@ -14,7 +15,7 @@
 (defn make-options [vals]
   (map (fn [val] [:option {:value val} val])  vals))
 
-(def home
+(defn build-home [request]
   (html [:html
           [:head
            [:link {:rel "stylesheet" 
@@ -23,26 +24,33 @@
                    :crossorigin "anonymous"
                    }]]
           [:body
-            [:div {:style "position:absolute; left:15%; top:15%"}
-             [:h1 "Mission Match"]
-             [:form 
-              [:div {:class "form-group"} 
-               [:textarea {:id "mission" :placeholder "Enter your mission..." :name "mission"}]]
-              [:div {:class "form-group"} 
-               (make-select 
-                {:id "age" :name "age"}
-                (make-options (range 18 35)))]
-              [:div {:class "form-group"}
-               (make-select
-                {:id "sex" :name "sex"}
-                [[:option {:value "male"} "Male"]
-                [:option {:value "female"} "Female"]])]
-              [:div {:class "form-group"} 
-               [:input {:id "email" :name "email" :placeholder "A Username"}]]
-              [:div {:class "form-group"} 
-               [:input {:id "password" :name "password" :placeholder "A Password"}]]
-              [:button {:id "submit-button"} "Submit Mission"]
-              ]]
+            [:div {:style "position:relative; margin-top:100px; margin-left:100px;" }
+              (if (contains? request :session)
+              [:h1 (str "Welcom to Mission Match, " ((request :session) :username))]
+              [:h1 "Mission Match"])
+              [:div {:style "float:left;"}
+              [:form 
+                [:div {:class "form-group"} 
+                [:textarea {:id "mission" :placeholder "Enter your mission..." :name "mission"}]]
+                [:div {:class "form-group"} 
+                (make-select 
+                  {:id "age" :name "age"}
+                  (make-options (range 18 35)))]
+                [:div {:class "form-group"}
+                (make-select
+                  {:id "sex" :name "sex"}
+                  [[:option {:value "male"} "Male"]
+                  [:option {:value "female"} "Female"]])]
+                [:div {:class "form-group"} 
+                [:input {:id "username" :name "username" :placeholder "A Username"}]]
+                [:div {:class "form-group"} 
+                [:input {:id "password" :name "password" :placeholder "A Password"}]]
+                [:button {:id "submit-button"} "Submit Mission"]
+                ]]
+              (if (contains? request :session)
+              [:div {:style "float:left; margin-left:50px;"}
+              [:ul
+                (mission/display ((request :session) "username"))]])]
             [:script {:src "//code.jquery.com/jquery-1.11.3.min.js"}]
             [:script {:src "js/app.js"}]
             ]]))
@@ -53,7 +61,7 @@
   
     {:status 200
       :headers  {"Content-Type" "text/html"}
-      :body home})
+      :body (build-home request)})
 
 (defn handler [request]
   (let [routes 
@@ -65,4 +73,5 @@
 (def main-handler 
   (-> handler 
       (wrap-file "resources/public")
-      (wrap-params)))
+      (wrap-params)
+      (wrap-session)))
