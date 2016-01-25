@@ -10,6 +10,8 @@
                  [mount "0.1.7"]
                  [com.stuartsierra/component "0.3.1"]
                  [com.novemberain/monger "3.0.0-rc2"]
+                 [semantic-similarity "1.0.0"];THIS IS MY FIRST LIBRARY!
+                 [digest "1.4.4"]
                  ]
   :plugins  [[lein-ring "0.8.11"]]
   :ring  {:handler mission-match.core/main-handler}

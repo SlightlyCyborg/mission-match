@@ -1,2 +1,7 @@
+#mission-wrapper ul{
+   list-style-type:none; 
+}
 
-
+#mission-wrapper {
+    border-width:1px;
+}

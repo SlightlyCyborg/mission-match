@@ -2,11 +2,16 @@
     (:require  [monger.core :as mg]
                [monger.collection :as mc]
                [monger.result :as mr]
-               [mission-match.db :as db]
-               )
+               [monger.query :as q]
+               [mission-match.db :as db])
+
      (:import org.bson.types.ObjectId)) 
 
-(defn existence [] "I exist")
+(use 'digest)
+
+
+(defn salt-and-sha-password [password]
+  (digest/sha-256 (str password "shake it like a salt shaker")))
 
 (defn insert-mission [args]
   (if (mr/acknowledged?
@@ -15,26 +20,37 @@
       :mission  (args "mission") 
       :age      (args "age")
       :sex      (args "sex")
-      :password (args "password")
+      :password (salt-and-sha-password (args "password"))
       :username (args "username")}))
     "success" "failure")) 
 
-(defn get-mission-by-user [user-id]
-  (mc/find-one-as-map (db/get-db) "missions" {:user-id user-id}))
 
+(defn get-mission-by-user [username]
+  (mc/find-one-as-map (db/get-db) "missions" {:username username}))
+
+
+(defn get-other-missions [mission]
+  (mc/find-maps (db/get-db) "missions" 
+                {:username {"$ne" (mission :username)}}))
+
+(defn get-missions-by-matches [matches username]
+    (map 
+      #(mc/find-one-as-map (db/get-db) "missions" {:username %1}) 
+      (flatten 
+        (map
+          #(filter
+            (fn [matched-user] (if (= username matched-user) false true))
+            (:users %1 ))
+    matches))))
 
 (defn get-missions []
-  (mc/find-maps))
+  (mc/find-maps (db/get-db) "missions" {}))
 
 (defn clear-collection []
  (mc/remove (db/get-db) "missions")
  (mc/empty? (db/get-db) "missions"))
 
-(defn display [username]
-  (map 
-    (fn [a-mission]
-      [:li (a-mission :mission)]) 
-    (mc/find-maps (db/get-db) "missions" {})))
+
 
 (defn test-insert-mission []
   (insert-mission {:text "My mission is to code" :user-id 1})
